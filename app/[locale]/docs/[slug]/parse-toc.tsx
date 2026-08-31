@@ -2,8 +2,12 @@ import { RichText } from "@/components/rich-text";
 import type { RichTextNode, RichTextTocNode } from "basehub/api-transaction";
 import type { TOCItemType } from "fumadocs-core/toc";
 
-export function parseToc(list: RichTextTocNode, level = 0): TOCItemType[] {
+export function parseToc(
+  list: RichTextTocNode | undefined,
+  level = 0,
+): TOCItemType[] {
   const results: TOCItemType[] = [];
+  if (!list) return results;
   if (list.type === "text") return [];
 
   for (const item of list.content ?? []) {
