@@ -15,6 +15,15 @@ export function Provider({
 }) {
   return (
     <RootProvider
+      i18n={{
+        locale,
+        locales: [
+          { locale: "en", name: "English" },
+          { locale: "id", name: "Bahasa Indonesia" },
+          { locale: "ja", name: "日本語" },
+          { locale: "ko", name: "한국어" },
+        ],
+      }}
       search={useMemo(
         () => ({
           SearchDialog(props) {
