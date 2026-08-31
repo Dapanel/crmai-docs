@@ -1,7 +1,22 @@
 import "./global.css";
 import { Geist_Mono } from "next/font/google";
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Toolbar } from "basehub/next-toolbar";
+
+export const metadata: Metadata = {
+  title: {
+    default: "CRMAI Docs",
+    template: "%s | CRMAI Docs",
+  },
+  description: "Dokumentasi resmi CRMAI.",
+  applicationName: "CRMAI Docs",
+  icons: {
+    icon: "/logos.svg",
+    shortcut: "/logos.svg",
+    apple: "/logos.svg",
+  },
+};
 
 const inter = Geist_Mono({
   subsets: ["latin"],
