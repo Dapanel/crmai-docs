@@ -9,8 +9,12 @@ function Logo() {
 export function getBaseOptions(locale: string): BaseLayoutProps {
   return {
     nav: {
-    children: <LanguageSelect currentLocale={locale as "en" | "id" | "ja" | "ko"} />,
-    title: (
+      children: (
+        <LanguageSelect
+          currentLocale={locale as "en" | "id" | "ja" | "ko"}
+        />
+      ),
+      title: (
         <>
           <Logo />
           CRMAI Docs
