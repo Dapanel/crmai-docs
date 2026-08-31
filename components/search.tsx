@@ -13,11 +13,13 @@ import {
   type SharedProps,
 } from "fumadocs-ui/components/dialog/search";
 import { useMemo } from "react";
+import type { Locale } from "@/app/[locale]/layout";
 
 export function Search({
   _searchKey,
+  locale,
   ...props
-}: SharedProps & { _searchKey: string }) {
+}: SharedProps & { _searchKey: string; locale: Locale }) {
   const search = useSearch({
     _searchKey,
     queryBy: ["_title", "richText", "category", "slug"],
@@ -28,7 +30,9 @@ export function Search({
 
     return search.result.hits.flatMap((hit) => {
       const items: ReactSortedResult[] = [];
-      const url = hit.document.slug ? `/docs/${hit.document.slug}` : "/docs";
+      const url = hit.document.slug
+        ? `/${locale}/docs/${hit.document.slug}`
+        : `/${locale}/docs`;
 
       items.push({
         id: hit._key,
@@ -68,7 +72,7 @@ export function Search({
 
       return items;
     });
-  }, [search.result]);
+  }, [locale, search.result]);
 
   return (
     <SearchDialog

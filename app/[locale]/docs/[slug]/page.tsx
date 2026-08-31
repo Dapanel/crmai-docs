@@ -4,25 +4,25 @@ import { notFound } from "next/navigation";
 import { basehub } from "basehub";
 import { Pump } from "basehub/react-pump";
 import { parseToc } from "./parse-toc";
+import { locales, type Locale } from "@/app/[locale]/layout";
 
 export default async function Page(props: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const params = await props.params;
+  const { locale, slug } = await props.params;
 
   return (
     <Pump
       queries={[
         {
           documentation: {
-            __args: { filter: { _sys_slug: { eq: params.slug } } },
+            // BaseHub production types currently omit the supported variants arg.
+            __args: ({
+              filter: { _sys_slug: { eq: slug } },
+              variants: { languages: locale as Locale },
+            } as never),
             item: {
-              richText: {
-                json: {
-                  content: true,
-                  toc: true,
-                },
-              },
+              richText: { json: { content: true, toc: true } },
               _title: true,
             },
           },
@@ -51,23 +51,17 @@ export default async function Page(props: {
 }
 
 export async function generateMetadata(props: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const params = await props.params;
+  const { locale, slug } = await props.params;
   const { documentation } = await basehub().query({
     documentation: {
-      __args: {
-        filter: {
-          _sys_slug: {
-            eq: params.slug,
-          },
-        },
+      __args: ({
+        filter: { _sys_slug: { eq: slug } },
         first: 1,
-      },
-      items: {
-        _title: true,
-        category: true,
-      },
+        variants: { languages: locale as Locale },
+      } as never),
+      items: { _title: true, category: true },
     },
   });
 
@@ -83,15 +77,13 @@ export async function generateMetadata(props: {
 export async function generateStaticParams() {
   const { documentation } = await basehub().query({
     documentation: {
-      items: {
-        _slug: true,
-      },
+      items: { _slug: true },
     },
   });
 
-  return documentation.items
-    .filter((item) => item._slug !== "index")
-    .map((item) => ({
-      slug: item._slug,
-    }));
+  return locales.flatMap((locale) =>
+    documentation.items
+      .filter((item) => item._slug !== "index")
+      .map((item) => ({ locale, slug: item._slug })),
+  );
 }

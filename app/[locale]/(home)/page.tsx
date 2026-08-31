@@ -1,6 +1,12 @@
 import Link from "fumadocs-core/link";
 
-export default async function HomePage() {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
   return (
     <main className="flex flex-1 flex-col justify-center text-center">
       <h1 className="mb-4 text-2xl font-bold">Welcome to CRMAI Docs</h1>
@@ -9,7 +15,7 @@ export default async function HomePage() {
       </p>
       <div className="flex flex-row items-center justify-center mt-4 gap-4">
         <Link
-          href="/docs"
+          href={`/${locale}/docs`}
           className="text-fd-foreground hover:text-fd-primary font-medium underline"
         >
           docs
