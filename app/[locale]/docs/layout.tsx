@@ -19,8 +19,7 @@ export default async function Layout({
       queries={[
         {
           documentation: {
-            // BaseHub production types currently omit the supported variants arg.
-            __args: ({ variants: { languages: locale as Locale } } as never),
+            __args: { variants: { languages: locale as Locale } } as never,
             items: { _slug: true, _title: true, category: true },
           },
         },
@@ -29,28 +28,34 @@ export default async function Layout({
       {async ([{ documentation }]) => {
         "use server";
 
-        const items: PageTree.Node[] = [];
+        const rootItems: PageTree.Node[] = [];
+        const groups = new Map<string, PageTree.Node[]>();
 
         for (const item of documentation.items) {
-          let idx = items.length;
-
-          if (item.category && item.category !== "Root") {
-            idx = items.findIndex((parent) => parent.name === item.category);
-
-            if (idx === -1) {
-              items.push({ type: "separator", name: item.category });
-              idx = items.length;
-            }
-          }
-
-          items.splice(idx, 0, {
+          const page: PageTree.Node = {
             type: "page",
             name: item._title,
             url:
               item._slug === "index"
                 ? `/${locale}/docs`
                 : `/${locale}/docs/${item._slug}`,
-          });
+          };
+
+          if (!item.category || item.category === "Root") {
+            rootItems.push(page);
+            continue;
+          }
+
+          if (!groups.has(item.category)) {
+            groups.set(item.category, []);
+          }
+          groups.get(item.category)!.push(page);
+        }
+
+        const items: PageTree.Node[] = [...rootItems];
+        for (const [category, pages] of groups) {
+          items.push({ type: "separator", name: category });
+          items.push(...pages);
         }
 
         return (
