@@ -17,10 +17,10 @@ export default async function Page(props: {
         {
           documentation: {
             // BaseHub production types currently omit the supported variants arg.
-            __args: ({
+            __args: {
               filter: { _sys_slug: { eq: slug } },
               variants: { languages: locale as Locale },
-            } as never),
+            } as never,
             item: {
               richText: { json: { content: true, toc: true } },
               _title: true,
@@ -56,12 +56,12 @@ export async function generateMetadata(props: {
   const { locale, slug } = await props.params;
   const { documentation } = await basehub().query({
     documentation: {
-      __args: ({
+      __args: {
         filter: { _sys_slug: { eq: slug } },
         first: 1,
         variants: { languages: locale as Locale },
-      } as never),
-      items: { _title: true, category: true },
+      } as never,
+      items: { _title: true, category: { _title: true } },
     },
   });
 
