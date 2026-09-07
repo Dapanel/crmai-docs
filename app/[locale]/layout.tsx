@@ -16,15 +16,10 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!locales.includes(locale as Locale)) notFound();
 
-  // const { documentation } = await basehub().query({
-  //   documentation: {
-  //     // BaseHub production types currently omit the supported variants arg.
-  //     __args: ({ variants: { languages: locale as Locale } } as never),
-  //     _searchKey: true,
-  //   },
-  // });
   const { documentation } = await basehub().query({
     documentation: {
+      // BaseHub production types currently omit the supported variants arg.
+      __args: { variants: { languages: locale as Locale } } as never,
       _searchKey: true,
     },
   });

@@ -2,7 +2,6 @@ import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import type { ReactNode } from "react";
 import { getBaseOptions } from "@/app/layout.config";
 import { Pump } from "basehub/react-pump";
-import { Icon } from "basehub/react-icon";
 import type * as PageTree from "fumadocs-core/page-tree";
 import type { Locale } from "@/app/[locale]/layout";
 
@@ -24,87 +23,39 @@ export default async function Layout({
             items: {
               _slug: true,
               _title: true,
-              icon: true,
-              order: true,
-              category: { _title: true, icon: true, order: true },
-              parent: { _slug: true },
-            },
-          },
-          categories: {
-            items: {
-              _title: true,
-              icon: true,
-              order: true,
-              defaultOpen: true,
+              category: { _title: true }, // <-- sama, select sub-field
             },
           },
         },
       ]}
     >
-      {async ([{ documentation, categories }]) => {
+      {async ([{ documentation }]) => {
         "use server";
 
-        type Item = (typeof documentation.items)[number];
+        const items: PageTree.Node[] = [];
 
-        function renderIcon(content?: string | null) {
-          return content ? <Icon content={content} /> : undefined;
-        }
+        for (const item of documentation.items) {
+          let idx = items.length;
+          const categoryTitle = item.category?._title;
 
-        function buildPageTree(
-          items: Item[],
-          parentSlug: string | null,
-        ): PageTree.Node[] {
-          return items
-            .filter((item) => (item.parent?._slug ?? null) === parentSlug)
-            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .map((item): PageTree.Node => {
-              const children = buildPageTree(items, item._slug);
-              const icon = renderIcon(item.icon);
-              const url =
-                item._slug === "index"
-                  ? `/${locale}/docs`
-                  : `/${locale}/docs/${item._slug}`;
+          if (categoryTitle && categoryTitle !== "Root") {
+            idx = items.findIndex((parent) => parent.name === categoryTitle);
 
-              if (children.length > 0) {
-                return {
-                  type: "folder",
-                  name: item._title,
-                  icon,
-                  defaultOpen: false,
-                  index: { type: "page", name: item._title, url },
-                  children,
-                };
-              }
+            if (idx === -1) {
+              items.push({ type: "separator", name: categoryTitle });
+              idx = items.length;
+            }
+          }
 
-              return { type: "page", name: item._title, icon, url };
-            });
-        }
-
-        // Item tanpa category (root-level, misal "Home")
-        const rootItems = buildPageTree(
-          documentation.items.filter((item) => !item.category),
-          null,
-        );
-
-        // Bangun folder per kategori, urut sesuai field order di Categories
-        const categoryNodes: PageTree.Node[] = categories.items
-          .slice()
-          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-          .map((cat) => {
-            const pagesInCategory = documentation.items.filter(
-              (item) => item.category?._title === cat._title,
-            );
-
-            return {
-              type: "folder",
-              name: cat._title,
-              icon: renderIcon(cat.icon),
-              defaultOpen: cat.defaultOpen ?? false,
-              children: buildPageTree(pagesInCategory, null),
-            } as PageTree.Node;
+          items.splice(idx, 0, {
+            type: "page",
+            name: item._title,
+            url:
+              item._slug === "index"
+                ? `/${locale}/docs`
+                : `/${locale}/docs/${item._slug}`,
           });
-
-        const items: PageTree.Node[] = [...rootItems, ...categoryNodes];
+        }
 
         return (
           <DocsLayout

@@ -61,7 +61,10 @@ export async function generateMetadata(props: {
         first: 1,
         variants: { languages: locale as Locale },
       } as never,
-      items: { _title: true, category: { _title: true } },
+      items: {
+        _title: true,
+        category: { _title: true }, // <-- pilih sub-field, jangan true
+      },
     },
   });
 
@@ -70,7 +73,7 @@ export async function generateMetadata(props: {
 
   return {
     title: page._title,
-    description: page.category,
+    description: page.category?._title,
   };
 }
 
