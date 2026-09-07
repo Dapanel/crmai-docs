@@ -4,7 +4,7 @@ import { getBaseOptions } from "@/app/layout.config";
 import { Pump } from "basehub/react-pump";
 import { Icon } from "basehub/react-icon";
 import type * as PageTree from "fumadocs-core/page-tree";
-import type { Locale } from "@/app/[locale]/layout";
+// import type { Locale } from "@/app/[locale]/layout";
 
 export default async function Layout({
   children,
@@ -20,7 +20,6 @@ export default async function Layout({
       queries={[
         {
           documentation: {
-            __args: { variants: { languages: locale as Locale } } as never,
             items: {
               _slug: true,
               _title: true,
