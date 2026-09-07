@@ -16,11 +16,9 @@ export default async function Page(props: {
       queries={[
         {
           documentation: {
-            // BaseHub production types currently omit the supported variants arg.
             __args: {
               filter: { _sys_slug: { eq: slug } },
-              variants: { languages: locale as Locale },
-            } as never,
+            },
             item: {
               richText: { json: { content: true, toc: true } },
               _title: true,
@@ -59,12 +57,8 @@ export async function generateMetadata(props: {
       __args: {
         filter: { _sys_slug: { eq: slug } },
         first: 1,
-        variants: { languages: locale as Locale },
-      } as never,
-      items: {
-        _title: true,
-        category: { _title: true }, // <-- pilih sub-field, jangan true
       },
+      items: { _title: true, category: { _title: true } },
     },
   });
 

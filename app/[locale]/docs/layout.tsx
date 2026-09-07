@@ -19,12 +19,7 @@ export default async function Layout({
       queries={[
         {
           documentation: {
-            __args: { variants: { languages: locale as Locale } } as never,
-            items: {
-              _slug: true,
-              _title: true,
-              category: { _title: true }, // <-- sama, select sub-field
-            },
+            items: { _slug: true, _title: true, category: { _title: true } },
           },
         },
       ]}

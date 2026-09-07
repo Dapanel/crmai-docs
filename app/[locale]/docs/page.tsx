@@ -17,7 +17,7 @@ export default async function Page({
         {
           documentation: {
             // BaseHub production types currently omit the supported variants arg.
-            __args: ({ variants: { languages: locale as Locale } } as never),
+            __args: { variants: { languages: locale as Locale } } as never,
             items: {
               _slug: true,
               _title: true,
