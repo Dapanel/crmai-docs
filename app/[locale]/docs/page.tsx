@@ -2,7 +2,6 @@ import { Pump } from "basehub/react-pump";
 import { RichText } from "basehub/react-rich-text";
 import { Card, Cards } from "fumadocs-ui/components/card";
 import { DocsBody, DocsPage, DocsTitle } from "fumadocs-ui/page";
-import type { Locale } from "@/app/[locale]/layout";
 
 export default async function Page({
   params,
@@ -16,8 +15,6 @@ export default async function Page({
       queries={[
         {
           documentation: {
-            // BaseHub production types currently omit the supported variants arg.
-            __args: { variants: { languages: locale as Locale } } as never,
             items: {
               _slug: true,
               _title: true,

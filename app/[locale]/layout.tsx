@@ -18,7 +18,6 @@ export default async function LocaleLayout({
 
   const { documentation } = await basehub().query({
     documentation: {
-      __args: { variants: { languages: locale as Locale } } as never,
       _searchKey: true,
     },
   });
