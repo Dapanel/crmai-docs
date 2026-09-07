@@ -1,4 +1,4 @@
-## Fumadocs BaseHub
+## Docs CRMAI BaseHub
 
 This is an example to use Fumadocs with BaseHub.
 
