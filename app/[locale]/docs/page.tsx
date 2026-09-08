@@ -27,7 +27,8 @@ export default async function Page({
       {async ([{ documentation }]) => {
         "use server";
 
-        const [home, ...items] = documentation.items;
+        const home = documentation.items.find((i) => i._slug === "index");
+        const items = documentation.items.filter((i) => i._slug !== "index");
         if (!home) return null;
 
         return (
