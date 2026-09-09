@@ -3,6 +3,7 @@ import { Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Toolbar } from "basehub/next-toolbar";
+import { ThemeScript } from "@/components/theme-script";
 
 export const metadata: Metadata = {
   title: {
@@ -32,7 +33,14 @@ export default async function Layout({
   const { locale } = await params;
 
   return (
-    <html lang={locale ?? "en"} className={inter.className} suppressHydrationWarning>
+    <html
+      lang={locale ?? "en"}
+      className={inter.className}
+      suppressHydrationWarning
+    >
+      <head>
+        <ThemeScript />
+      </head>
       <body className="flex flex-col min-h-screen">
         {children}
         <Toolbar />
