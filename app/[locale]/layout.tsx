@@ -2,6 +2,7 @@ import { basehub } from "basehub";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { Provider } from "@/app/provider";
+import { Toolbar } from "basehub/next-toolbar";
 
 export const locales = ["en", "id", "ja", "ko"] as const;
 export type Locale = (typeof locales)[number];
@@ -24,6 +25,7 @@ export default async function LocaleLayout({
 
   return (
     <Provider _searchKey={documentation._searchKey} locale={locale as Locale}>
+      <Toolbar />
       {children}
     </Provider>
   );
