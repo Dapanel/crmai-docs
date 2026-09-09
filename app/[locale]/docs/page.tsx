@@ -2,7 +2,7 @@ import { Pump } from "basehub/react-pump";
 import { RichText } from "basehub/react-rich-text";
 import { Card, Cards } from "fumadocs-ui/components/card";
 import { DocsBody, DocsPage, DocsTitle } from "fumadocs-ui/page";
-import { renderIcon } from "./icon";
+import { renderIcon } from "./render-icon";
 
 export default async function Page({
   params,
