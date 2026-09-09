@@ -2,7 +2,7 @@ import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import type { ReactNode } from "react";
 import { getBaseOptions } from "@/app/layout.config";
 import { Pump } from "basehub/react-pump";
-import { Icon } from "basehub/react-icon";
+import { renderIcon } from "./icon";
 import type * as PageTree from "fumadocs-core/page-tree";
 
 export default async function Layout({
@@ -44,10 +44,6 @@ export default async function Layout({
         "use server";
 
         type Item = (typeof documentation.items)[number];
-
-        function renderIcon(content?: string | null) {
-          return content ? <Icon content={content} /> : undefined;
-        }
 
         function buildPageTree(
           items: Item[],
