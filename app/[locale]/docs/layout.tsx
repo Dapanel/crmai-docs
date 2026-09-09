@@ -4,7 +4,6 @@ import { getBaseOptions } from "@/app/layout.config";
 import { Pump } from "basehub/react-pump";
 import { Icon } from "basehub/react-icon";
 import type * as PageTree from "fumadocs-core/page-tree";
-// import type { Locale } from "@/app/[locale]/layout";
 
 export default async function Layout({
   children,
@@ -25,6 +24,7 @@ export default async function Layout({
               _title: true,
               icon: true,
               order: true,
+              isClickable: true,
               category: { _title: true, icon: true, order: true },
               parent: { _slug: true },
             },
@@ -65,27 +65,30 @@ export default async function Layout({
                   : `/${locale}/docs/${item._slug}`;
 
               if (children.length > 0) {
-                return {
+                const node: PageTree.Node = {
                   type: "folder",
                   name: item._title,
                   icon,
                   defaultOpen: false,
-                  index: { type: "page", name: item._title, url },
                   children,
                 };
+
+                if (item.isClickable !== false) {
+                  node.index = { type: "page", name: item._title, url };
+                }
+
+                return node;
               }
 
               return { type: "page", name: item._title, icon, url };
             });
         }
 
-        // Item tanpa category (root-level, misal "Home")
         const rootItems = buildPageTree(
           documentation.items.filter((item) => !item.category),
           null,
         );
 
-        // Bangun folder per kategori, urut sesuai field order di Categories
         const categoryNodes: PageTree.Node[] = categories.items
           .slice()
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
