@@ -4,6 +4,7 @@ import { getBaseOptions } from "@/app/layout.config";
 import { Pump } from "basehub/react-pump";
 import { renderIcon } from "./render-icon";
 import type * as PageTree from "fumadocs-core/page-tree";
+import type { Locale } from "@/app/[locale]/layout";
 
 export default async function Layout({
   children,
@@ -19,31 +20,36 @@ export default async function Layout({
       queries={[
         {
           documentation: {
-            items: {
-              _slug: true,
-              _title: true,
-              icon: true,
-              order: true,
-              isClickable: true,
-              category: { _title: true, icon: true, order: true },
-              parent: { _slug: true },
+            pages: {
+              __args: { variants: { languages: locale as Locale } } as never,
+              items: {
+                _slug: true,
+                _title: true,
+                icon: true,
+                order: true,
+                isClickable: true,
+                category: { _title: true, icon: true, order: true },
+                parent: { _slug: true },
+              },
             },
-          },
-          categories: {
-            items: {
-              _title: true,
-              icon: true,
-              order: true,
-              defaultOpen: true,
+            categories: {
+              items: {
+                _title: true,
+                icon: true,
+                order: true,
+                defaultOpen: true,
+              },
             },
           },
         },
       ]}
     >
-      {async ([{ documentation, categories }]) => {
+      {async ([{ documentation }]) => {
         "use server";
 
-        type Item = (typeof documentation.items)[number];
+        const { pages, categories } = documentation;
+
+        type Item = (typeof pages.items)[number];
 
         function buildPageTree(
           items: Item[],
@@ -81,7 +87,7 @@ export default async function Layout({
         }
 
         const rootItems = buildPageTree(
-          documentation.items.filter((item) => !item.category),
+          pages.items.filter((item) => !item.category),
           null,
         );
 
@@ -89,7 +95,7 @@ export default async function Layout({
           .slice()
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
           .map((cat) => {
-            const pagesInCategory = documentation.items.filter(
+            const pagesInCategory = pages.items.filter(
               (item) => item.category?._title === cat._title,
             );
 

@@ -16,12 +16,16 @@ export default async function Page(props: {
       queries={[
         {
           documentation: {
-            __args: {
-              filter: { _sys_slug: { eq: slug } },
-            },
-            item: {
-              richText: { json: { content: true, toc: true } },
-              _title: true,
+            pages: {
+              __args: {
+                variants: { languages: locale as Locale },
+                filter: { _sys_slug: { eq: slug } },
+                first: 1,
+              } as never,
+              items: {
+                richText: { json: { content: true, toc: true } },
+                _title: true,
+              },
             },
           },
         },
@@ -30,7 +34,7 @@ export default async function Page(props: {
       {async ([{ documentation }]) => {
         "use server";
 
-        const page = documentation.item;
+        const page = documentation.pages.items.at(0);
         if (!page) notFound();
 
         return (
@@ -54,15 +58,18 @@ export async function generateMetadata(props: {
   const { locale, slug } = await props.params;
   const { documentation } = await basehub().query({
     documentation: {
-      __args: {
-        filter: { _sys_slug: { eq: slug } },
-        first: 1,
+      pages: {
+        __args: {
+          variants: { languages: locale as Locale },
+          filter: { _sys_slug: { eq: slug } },
+          first: 1,
+        } as never,
+        items: { _title: true, category: { _title: true } },
       },
-      items: { _title: true, category: { _title: true } },
     },
   });
 
-  const page = documentation.items.at(0);
+  const page = documentation.pages.items.at(0);
   if (!page) notFound();
 
   return {
@@ -74,12 +81,14 @@ export async function generateMetadata(props: {
 export async function generateStaticParams() {
   const { documentation } = await basehub().query({
     documentation: {
-      items: { _slug: true },
+      pages: {
+        items: { _slug: true },
+      },
     },
   });
 
   return locales.flatMap((locale) =>
-    documentation.items
+    documentation.pages.items
       .filter((item) => item._slug !== "index")
       .map((item) => ({ locale, slug: item._slug })),
   );

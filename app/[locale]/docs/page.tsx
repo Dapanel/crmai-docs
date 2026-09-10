@@ -3,6 +3,7 @@ import { RichText } from "basehub/react-rich-text";
 import { Card, Cards } from "fumadocs-ui/components/card";
 import { DocsBody, DocsPage, DocsTitle } from "fumadocs-ui/page";
 import { renderIcon } from "./render-icon";
+import type { Locale } from "@/app/[locale]/layout";
 
 export default async function Page({
   params,
@@ -16,29 +17,34 @@ export default async function Page({
       queries={[
         {
           documentation: {
-            items: {
-              _slug: true,
-              _title: true,
-              order: true,
-              icon: true,
-              richText: { json: { content: true } },
-              category: { _title: true, icon: true },
-              parent: { _slug: true },
+            pages: {
+              __args: { variants: { languages: locale as Locale } } as never,
+              items: {
+                _slug: true,
+                _title: true,
+                order: true,
+                icon: true,
+                richText: { json: { content: true } },
+                category: { _title: true, icon: true },
+                parent: { _slug: true },
+              },
             },
-          },
-          categories: {
-            items: { _title: true, icon: true, order: true },
+            categories: {
+              items: { _title: true, icon: true, order: true },
+            },
           },
         },
       ]}
     >
-      {async ([{ documentation, categories }]) => {
+      {async ([{ documentation }]) => {
         "use server";
 
-        const home = documentation.items.find((i) => i._slug === "index");
+        const { pages, categories } = documentation;
+
+        const home = pages.items.find((i) => i._slug === "index");
         if (!home) return null;
 
-        const topLevelItems = documentation.items.filter(
+        const topLevelItems = pages.items.filter(
           (item) => item._slug !== "index" && !item.parent,
         );
 
