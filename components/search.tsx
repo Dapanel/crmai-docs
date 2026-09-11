@@ -22,7 +22,7 @@ export function Search({
 }: SharedProps & { _searchKey: string; locale: Locale }) {
   const search = useSearch({
     _searchKey,
-    queryBy: ["_title", "richText", "category", "slug"],
+    queryBy: ["_title", "richText", "category", "_slug"],
   });
 
   const results = useMemo(() => {
@@ -30,8 +30,8 @@ export function Search({
 
     return search.result.hits.flatMap((hit) => {
       const items: ReactSortedResult[] = [];
-      const url = hit.document.slug
-        ? `/${locale}/docs/${hit.document.slug}`
+      const url = hit.document._slug
+        ? `/${locale}/docs/${hit.document._slug}`
         : `/${locale}/docs`;
 
       items.push({
