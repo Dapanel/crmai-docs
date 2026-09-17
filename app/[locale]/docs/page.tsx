@@ -30,6 +30,7 @@ export default async function Page({
               },
             },
             categories: {
+              __args: { variants: { languages: locale as Locale } } as never,
               items: { _slug: true, _title: true, icon: true, order: true },
             },
           },
