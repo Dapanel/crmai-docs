@@ -25,12 +25,12 @@ export default async function Page({
                 order: true,
                 icon: true,
                 richText: { json: { content: true } },
-                category: { _title: true, icon: true },
+                category: { _slug: true, _title: true, icon: true },
                 parent: { _slug: true },
               },
             },
             categories: {
-              items: { _title: true, icon: true, order: true },
+              items: { _slug: true, _title: true, icon: true, order: true },
             },
           },
         },
@@ -60,7 +60,7 @@ export default async function Page({
             category: cat,
             items: sortByOrder(
               topLevelItems.filter(
-                (item) => item.category?._title === cat._title,
+                (item) => item.category?._slug === cat._slug,
               ),
             ),
           }))

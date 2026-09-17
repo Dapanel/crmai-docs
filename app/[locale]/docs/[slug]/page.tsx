@@ -5,6 +5,12 @@ import { basehub } from "basehub";
 import { Pump } from "basehub/react-pump";
 import { parseToc } from "./parse-toc";
 import { locales, type Locale } from "@/app/[locale]/layout";
+import type { Metadata } from "next";
+import {
+  descriptionFromRichText,
+  localeAlternates,
+  localizedUrl,
+} from "@/seo";
 
 export default async function Page(props: {
   params: Promise<{ locale: string; slug: string }>;
@@ -64,7 +70,11 @@ export async function generateMetadata(props: {
           filter: { _sys_slug: { eq: slug } },
           first: 1,
         } as never,
-        items: { _title: true, category: { _title: true } },
+        items: {
+          _title: true,
+          category: { _title: true },
+          richText: { json: { content: true } },
+        },
       },
     },
   });
@@ -74,7 +84,25 @@ export async function generateMetadata(props: {
 
   return {
     title: page._title,
-    description: page.category?._title,
+    description: descriptionFromRichText(
+      page.richText?.json.content,
+      page.category?._title
+        ? `${page._title} — ${page.category._title}`
+        : `Pelajari ${page._title} di CRMAI Docs.`,
+    ),
+    alternates: {
+      canonical: localizedUrl(locale as Locale, `/docs/${slug}`),
+      ...localeAlternates(`/docs/${slug}`),
+    },
+    openGraph: {
+      type: "article",
+      title: page._title,
+      description: descriptionFromRichText(
+        page.richText?.json.content,
+        `Pelajari ${page._title} di CRMAI Docs.`,
+      ),
+      url: localizedUrl(locale as Locale, `/docs/${slug}`),
+    },
   };
 }
 

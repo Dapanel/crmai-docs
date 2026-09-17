@@ -1,4 +1,24 @@
 import Link from "fumadocs-core/link";
+import type { Metadata } from "next";
+import { localeAlternates, localizedUrl, siteName } from "@/seo";
+import type { Locale } from "@/app/[locale]/layout";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title: siteName,
+    description:
+      "Dokumentasi resmi CRMAI untuk membantu tim menggunakan platform CRM berbasis WhatsApp.",
+    alternates: {
+      canonical: localizedUrl(locale as Locale),
+      ...localeAlternates(),
+    },
+  };
+}
 
 export default async function HomePage({
   params,

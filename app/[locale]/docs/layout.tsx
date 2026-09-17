@@ -28,12 +28,13 @@ export default async function Layout({
                 icon: true,
                 order: true,
                 isClickable: true,
-                category: { _title: true, icon: true, order: true },
+                category: { _slug: true, _title: true, icon: true, order: true },
                 parent: { _slug: true },
               },
             },
             categories: {
               items: {
+                _slug: true,
                 _title: true,
                 icon: true,
                 order: true,
@@ -96,7 +97,7 @@ export default async function Layout({
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
           .map((cat) => {
             const pagesInCategory = pages.items.filter(
-              (item) => item.category?._title === cat._title,
+              (item) => item.category?._slug === cat._slug,
             );
 
             return {
