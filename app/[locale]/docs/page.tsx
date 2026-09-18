@@ -83,7 +83,7 @@ export default async function Page({
         return (
           <DocsPage>
             <DocsTitle>Introduction</DocsTitle>
-            <DocsBody className="text-sm">
+            <DocsBody>
               <RichText content={home.richText?.json.content} />
 
               {uncategorized.length > 0 && renderCards(uncategorized)}

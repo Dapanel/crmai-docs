@@ -48,7 +48,7 @@ export default async function Page(props: {
             toc={page.richText ? parseToc(page.richText.json.toc[0]) : []}
           >
             <DocsTitle>{page._title}</DocsTitle>
-            <DocsBody className="text-sm">
+            <DocsBody>
               <RichText content={page.richText?.json.content} />
             </DocsBody>
           </DocsPage>
