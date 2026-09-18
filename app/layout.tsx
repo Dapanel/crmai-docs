@@ -1,5 +1,5 @@
 import "./global.css";
-import { Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Toolbar } from "basehub/next-toolbar";
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
 };
 
-const inter = Geist_Mono({
+const inter = Inter({
   subsets: ["latin"],
 });
 
