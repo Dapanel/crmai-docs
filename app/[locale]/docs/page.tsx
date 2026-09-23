@@ -1,5 +1,6 @@
 import { Pump } from "basehub/react-pump";
 import { RichText } from "basehub/react-rich-text";
+import type { ReactNode } from "react";
 import { Card, Cards } from "fumadocs-ui/components/card";
 import { DocsBody, DocsPage, DocsTitle } from "fumadocs-ui/page";
 import { renderIcon } from "./render-icon";
@@ -24,6 +25,7 @@ export default async function Page({
                 _title: true,
                 order: true,
                 icon: true,
+                isClickable: true,
                 richText: { json: { content: true } },
                 category: { _slug: true, _title: true, icon: true },
                 parent: { _slug: true },
@@ -67,18 +69,60 @@ export default async function Page({
           }))
           .filter((group) => group.items.length > 0);
 
-        const renderCards = (items: typeof topLevelItems) => (
-          <Cards>
-            {items.map((item) => (
-              <Card
-                key={item._slug}
-                href={`/${locale}/docs/${item._slug}`}
-                title={item._title}
-                icon={renderIcon(item.icon)}
-              />
-            ))}
-          </Cards>
-        );
+        const getChildren = (item: (typeof pages.items)[number]) =>
+          pages.items
+            .filter((child) => child.parent?._slug === item._slug)
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+        const renderLevel = (items: typeof topLevelItems): ReactNode => {
+          const articleItems = items.filter(
+            (item) => item.isClickable !== false && getChildren(item).length === 0,
+          );
+          const groupedItems = items.filter(
+            (item) => getChildren(item).length > 0,
+          );
+
+          return (
+            <>
+              {articleItems.length > 0 && (
+                <Cards>
+                  {articleItems.map((item) => (
+                    <Card
+                      key={item._slug}
+                      href={`/${locale}/docs/${item._slug}`}
+                      title={item._title}
+                      icon={renderIcon(item.icon)}
+                    />
+                  ))}
+                </Cards>
+              )}
+
+              {groupedItems.map((item) => {
+                const children = getChildren(item);
+                const isClickable = item.isClickable !== false;
+
+                return (
+                  <section key={item._slug} className="mt-6">
+                    <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-fd-foreground">
+                      {renderIcon(item.icon)}
+                      {isClickable ? (
+                        <a
+                          href={`/${locale}/docs/${item._slug}`}
+                          className="hover:text-fd-primary"
+                        >
+                          {item._title}
+                        </a>
+                      ) : (
+                        item._title
+                      )}
+                    </h3>
+                    {renderLevel(children)}
+                  </section>
+                );
+              })}
+            </>
+          );
+        };
 
         return (
           <DocsPage>
@@ -86,7 +130,7 @@ export default async function Page({
             <DocsBody>
               <RichText content={home.richText?.json.content} />
 
-              {uncategorized.length > 0 && renderCards(uncategorized)}
+              {uncategorized.length > 0 && renderLevel(uncategorized)}
 
               {groups.map(({ category, items }) => (
                 <div key={category._title}>
@@ -94,7 +138,7 @@ export default async function Page({
                     {renderIcon(category.icon)}
                     {category._title}
                   </h2>
-                  {renderCards(items)}
+                  {renderLevel(items)}
                 </div>
               ))}
             </DocsBody>

@@ -23,6 +23,7 @@ export function Search({
   const search = useSearch({
     _searchKey,
     queryBy: ["_title", "richText", "category", "_slug"],
+    filterBy: "isClickable:=true",
   });
 
   const results = useMemo(() => {

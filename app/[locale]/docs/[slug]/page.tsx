@@ -1,4 +1,5 @@
 import { RichText } from "@/components/rich-text";
+import { Card, Cards } from "fumadocs-ui/components/card";
 import { DocsPage, DocsBody, DocsTitle } from "fumadocs-ui/layouts/docs/page";
 import { notFound } from "next/navigation";
 import { basehub } from "basehub";
@@ -11,6 +12,14 @@ import {
   localeAlternates,
   localizedUrl,
 } from "@/seo";
+import { renderIcon } from "../render-icon";
+
+const parentIntro: Record<Locale, string> = {
+  en: "Choose a guide below to learn more about",
+  id: "Pilih panduan di bawah untuk mempelajari lebih lanjut tentang",
+  ja: "詳しく見るには、以下のガイドを選択してください：",
+  ko: "자세한 내용은 아래 가이드를 선택하세요:",
+};
 
 export default async function Page(props: {
   params: Promise<{ locale: string; slug: string }>;
@@ -25,12 +34,15 @@ export default async function Page(props: {
             pages: {
               __args: {
                 variants: { languages: locale as Locale },
-                filter: { _sys_slug: { eq: slug } },
-                first: 1,
               } as never,
               items: {
+                _slug: true,
                 richText: { json: { content: true, toc: true } },
                 _title: true,
+                icon: true,
+                order: true,
+                isClickable: true,
+                parent: { _slug: true },
               },
             },
           },
@@ -40,8 +52,15 @@ export default async function Page(props: {
       {async ([{ documentation }]) => {
         "use server";
 
-        const page = documentation.pages.items.at(0);
+        const page = documentation.pages.items.find((item) => item._slug === slug);
         if (!page) notFound();
+
+        const children = documentation.pages.items
+          .filter((item) => item.parent?._slug === slug)
+          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+        const hasContent = (page.richText?.json.content?.length ?? 0) > 0;
+        const isParentOnly = !hasContent && children.length > 0;
 
         return (
           <DocsPage
@@ -49,7 +68,26 @@ export default async function Page(props: {
           >
             <DocsTitle>{page._title}</DocsTitle>
             <DocsBody>
-              <RichText content={page.richText?.json.content} />
+              {isParentOnly ? (
+                <>
+                  <p>
+                    {parentIntro[locale as Locale]} {page._title}
+                    {locale === "en" || locale === "id" ? "." : ""}
+                  </p>
+                  <Cards>
+                    {children.map((child) => (
+                      <Card
+                        key={child._slug}
+                        href={`/${locale}/docs/${child._slug}`}
+                        title={child._title}
+                        icon={renderIcon(child.icon)}
+                      />
+                    ))}
+                  </Cards>
+                </>
+              ) : (
+                <RichText content={page.richText?.json.content} />
+              )}
             </DocsBody>
           </DocsPage>
         );
