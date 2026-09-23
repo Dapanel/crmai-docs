@@ -8,6 +8,7 @@ function Logo() {
 export function getBaseOptions(locale: string): BaseLayoutProps {
   return {
     nav: {
+      url: `/${locale}`,
       title: (
         <>
           <Logo />
