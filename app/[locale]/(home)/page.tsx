@@ -9,6 +9,7 @@ const homeCopy: Record<
     title: string;
     description: string;
     browseDocs: string;
+    visitCrmai: string;
     contactSupport: string;
   }
 > = {
@@ -17,6 +18,7 @@ const homeCopy: Record<
     description:
       "Learn how to set up your workspace, manage conversations, and use CRMAI features.",
     browseDocs: "Browse documentation",
+    visitCrmai: "Visit CRMAI",
     contactSupport: "Contact support on WhatsApp",
   },
   id: {
@@ -24,6 +26,7 @@ const homeCopy: Record<
     description:
       "Pelajari cara menyiapkan workspace, mengelola percakapan, dan menggunakan fitur CRMAI.",
     browseDocs: "Lihat dokumentasi",
+    visitCrmai: "Kunjungi CRMAI",
     contactSupport: "Hubungi dukungan lewat WhatsApp",
   },
   ja: {
@@ -31,6 +34,7 @@ const homeCopy: Record<
     description:
       "ワークスペースの設定、会話の管理、CRMAIの機能の使い方を確認できます。",
     browseDocs: "ドキュメントを見る",
+    visitCrmai: "CRMAIを見る",
     contactSupport: "WhatsAppでサポートに連絡",
   },
   ko: {
@@ -38,6 +42,7 @@ const homeCopy: Record<
     description:
       "워크스페이스 설정, 대화 관리, CRMAI 기능 사용 방법을 확인하세요.",
     browseDocs: "문서 보기",
+    visitCrmai: "CRMAI 방문",
     contactSupport: "WhatsApp으로 지원팀에 문의",
   },
 };
@@ -80,6 +85,12 @@ export default async function HomePage({
         >
           {copy.browseDocs}
         </Link>
+        <a
+          href="https://crmai.id"
+          className="text-fd-foreground hover:text-fd-primary font-medium underline underline-offset-4"
+        >
+          {copy.visitCrmai}
+        </a>
         <Link
           href="https://api.whatsapp.com/send?phone=628113111882"
           target="_blank"
