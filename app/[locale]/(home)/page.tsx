@@ -87,6 +87,8 @@ export default async function HomePage({
         </Link>
         <a
           href="https://crmai.id"
+          target="_blank"
+          rel="noopener noreferrer"
           className="text-fd-foreground hover:text-fd-primary font-medium underline underline-offset-4"
         >
           {copy.visitCrmai}
