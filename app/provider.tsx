@@ -8,10 +8,12 @@ export function Provider({
   children,
   _searchKey,
   locale,
+  nonClickableSlugs,
 }: {
   children: ReactNode;
   _searchKey: string;
   locale: Locale;
+  nonClickableSlugs: string[];
 }) {
   return (
     <RootProvider
@@ -27,10 +29,17 @@ export function Provider({
       search={useMemo(
         () => ({
           SearchDialog(props) {
-            return <Search {...props} _searchKey={_searchKey} locale={locale} />;
+            return (
+              <Search
+                {...props}
+                _searchKey={_searchKey}
+                locale={locale}
+                nonClickableSlugs={nonClickableSlugs}
+              />
+            );
           },
         }),
-        [_searchKey, locale],
+        [_searchKey, locale, nonClickableSlugs],
       )}
     >
       {children}

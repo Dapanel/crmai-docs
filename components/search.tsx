@@ -18,62 +18,72 @@ import type { Locale } from "@/app/[locale]/layout";
 export function Search({
   _searchKey,
   locale,
+  nonClickableSlugs,
   ...props
-}: SharedProps & { _searchKey: string; locale: Locale }) {
+}: SharedProps & {
+  _searchKey: string;
+  locale: Locale;
+  nonClickableSlugs: string[];
+}) {
   const search = useSearch({
     _searchKey,
     queryBy: ["_title", "richText", "category", "_slug"],
-    filterBy: "isClickable:=true",
   });
+  const nonClickableSlugSet = useMemo(
+    () => new Set(nonClickableSlugs),
+    [nonClickableSlugs],
+  );
 
   const results = useMemo(() => {
     if (!search.result || search.result.empty) return null;
 
-    return search.result.hits.flatMap((hit) => {
-      const items: ReactSortedResult[] = [];
-      const url = hit.document._slug
-        ? `/${locale}/docs/${hit.document._slug}`
-        : `/${locale}/docs`;
-
-      items.push({
-        id: hit._key,
-        content: (
-          <span className="font-medium">
-            {hit.highlight?._title ? (
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: hit.highlight._title.snippet as string,
-                }}
-              />
-            ) : (
-              hit.document._title
-            )}
-          </span>
-        ),
-        type: "page",
-        url,
-      });
-
-      for (const h of hit.highlights) {
-        if (!h.snippet || h.fieldPath === "title") continue;
+    return search.result.hits
+      .filter((hit) => !nonClickableSlugSet.has(hit.document._slug ?? ""))
+      .flatMap((hit) => {
+        const items: ReactSortedResult[] = [];
+        const url = hit.document._slug
+          ? `/${locale}/docs/${hit.document._slug}`
+          : `/${locale}/docs`;
 
         items.push({
-          id: `${hit._key}-${h.fieldPath}`,
-          type: "text",
+          id: hit._key,
           content: (
-            <span
-              dangerouslySetInnerHTML={{
-                __html: h.snippet as string,
-              }}
-            />
+            <span className="font-medium">
+              {hit.highlight?._title ? (
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: hit.highlight._title.snippet as string,
+                  }}
+                />
+              ) : (
+                hit.document._title
+              )}
+            </span>
           ),
+          type: "page",
           url,
         });
-      }
 
-      return items;
-    });
-  }, [locale, search.result]);
+        for (const h of hit.highlights) {
+          if (!h.snippet || h.fieldPath === "title") continue;
+
+          items.push({
+            id: `${hit._key}-${h.fieldPath}`,
+            type: "text",
+            content: (
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: h.snippet as string,
+                }}
+              />
+            ),
+            url,
+          });
+        }
+
+        return items;
+      });
+  }, [locale, nonClickableSlugSet, search.result]);
 
   return (
     <SearchDialog

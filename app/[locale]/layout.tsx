@@ -22,6 +22,7 @@ export default async function LocaleLayout({
       pages: {
         __args: { variants: { languages: locale as Locale } } as never,
         _searchKey: true,
+        items: { _slug: true, isClickable: true },
       },
     },
   });
@@ -30,6 +31,9 @@ export default async function LocaleLayout({
     <Provider
       _searchKey={documentation.pages._searchKey}
       locale={locale as Locale}
+      nonClickableSlugs={documentation.pages.items
+        .filter((page) => page.isClickable === false)
+        .map((page) => page._slug)}
     >
       <Toolbar />
       {children}
