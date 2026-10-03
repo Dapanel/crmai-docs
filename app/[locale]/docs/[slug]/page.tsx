@@ -66,7 +66,7 @@ export default async function Page(props: {
           <DocsPage
             toc={page.richText ? parseToc(page.richText.json.toc[0]) : []}
           >
-            <DocsTitle>{page._title}</DocsTitle>
+            {!hasContent && <DocsTitle>{page._title}</DocsTitle>}
             <DocsBody>
               {isParentOnly ? (
                 <>
