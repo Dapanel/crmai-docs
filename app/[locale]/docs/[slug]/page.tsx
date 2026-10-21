@@ -1,9 +1,11 @@
 import { RichText } from "@/components/rich-text";
-import { Card, Cards } from "fumadocs-ui/components/card";
+import Link from "fumadocs-core/link";
+import { Cards } from "fumadocs-ui/components/card";
 import { DocsPage, DocsBody, DocsTitle } from "fumadocs-ui/layouts/docs/page";
 import { notFound } from "next/navigation";
 import { basehub } from "basehub";
 import { Pump } from "basehub/react-pump";
+import type { ReactNode } from "react";
 import { parseToc } from "./parse-toc";
 import type { Locale } from "@/locales";
 import type { Metadata } from "next";
@@ -24,6 +26,31 @@ const parentIntro: Record<Locale, string> = {
   ja: "詳しく見るには、以下のガイドを選択してください：",
   ko: "자세한 내용은 아래 가이드를 선택하세요:",
 };
+
+function ChildCard({
+  href,
+  title,
+  icon,
+}: {
+  href: string;
+  title: string;
+  icon?: ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      data-card
+      className="block rounded-xl border bg-fd-card p-4 text-fd-card-foreground transition-colors hover:bg-fd-accent/80 @max-lg:col-span-full"
+    >
+      {icon && (
+        <div className="not-prose mb-2 w-fit rounded-lg border bg-fd-muted p-1.5 text-fd-muted-foreground shadow-md [&_svg]:size-4">
+          {icon}
+        </div>
+      )}
+      <h2 className="not-prose mb-1 text-sm font-medium">{title}</h2>
+    </Link>
+  );
+}
 
 export default async function Page(props: {
   params: Promise<{ locale: string; slug: string }>;
@@ -80,7 +107,7 @@ export default async function Page(props: {
                   </p>
                   <Cards>
                     {children.map((child) => (
-                      <Card
+                      <ChildCard
                         key={child._slug}
                         href={`/${locale}/docs/${child._slug}`}
                         title={child._title}
