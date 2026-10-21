@@ -1,10 +1,86 @@
 import { Pump } from "basehub/react-pump";
+import { basehub } from "basehub";
 import { RichText } from "basehub/react-rich-text";
 import type { ReactNode } from "react";
 import { Card, Cards } from "fumadocs-ui/components/card";
 import { DocsBody, DocsPage, DocsTitle } from "fumadocs-ui/page";
 import { renderIcon } from "./render-icon";
-import type { Locale } from "@/app/[locale]/layout";
+import type { Locale } from "@/locales";
+import type { Metadata } from "next";
+import { localeAlternates, localizedUrl, siteName } from "@/seo";
+
+const docsIndexCopy: Record<Locale, { title: string; description: string }> = {
+  en: {
+    title: "Documentation | CRMAI Help Center",
+    description:
+      "Browse CRMAI setup and usage guides for conversations, AI agents, channels, and workspace settings.",
+  },
+  id: {
+    title: "Dokumentasi | Pusat Bantuan CRMAI",
+    description:
+      "Jelajahi panduan pengaturan dan penggunaan CRMAI untuk percakapan, AI Agent, kanal, dan workspace.",
+  },
+  ja: {
+    title: "ドキュメント｜CRMAI公式ガイド",
+    description:
+      "会話、AIエージェント、チャネル、ワークスペースの設定と使い方をCRMAIのガイドで確認できます。",
+  },
+  ko: {
+    title: "문서 | CRMAI 사용 가이드",
+    description:
+      "대화, AI 에이전트, 채널, 워크스페이스 설정과 사용 방법을 CRMAI 가이드에서 확인하세요.",
+  },
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const copy = docsIndexCopy[locale as Locale];
+  const url = localizedUrl(locale as Locale, "/docs");
+  const { documentation } = await basehub().query({
+    documentation: {
+      pages: {
+        __args: {
+          variants: { languages: locale as Locale },
+          filter: { _sys_slug: { eq: "index" } },
+          first: 1,
+        } as never,
+        items: {
+          seoTitle: true,
+          seoDescription: { plainText: true },
+        },
+      },
+    },
+  });
+  const page = documentation.pages.items.at(0);
+  const title = page?.seoTitle?.trim() || copy.title;
+  const description =
+    page?.seoDescription?.plainText.trim() || copy.description;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      ...localeAlternates("/docs"),
+    },
+    openGraph: {
+      type: "website",
+      siteName,
+      title,
+      description,
+      url,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+  };
+}
 
 export default async function Page({
   params,
@@ -126,7 +202,7 @@ export default async function Page({
 
         return (
           <DocsPage>
-            <DocsTitle>Introduction</DocsTitle>
+            <DocsTitle>{home._title}</DocsTitle>
             <DocsBody>
               <RichText content={home.richText?.json.content} />
 

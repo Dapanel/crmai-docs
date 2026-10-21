@@ -1,7 +1,7 @@
-import type { Locale } from "@/app/[locale]/layout";
+import { locales, type Locale } from "@/locales";
 
 export const siteUrl = "https://docs.crmai.id";
-export const siteName = "CRMAI Docs";
+export const siteName = "CRMAI";
 
 export const localeLabels: Record<Locale, string> = {
   en: "English",
@@ -14,15 +14,19 @@ export function localizedUrl(locale: Locale, path = "") {
   return `${siteUrl}/${locale}${path}`;
 }
 
-export function localeAlternates(path = "") {
+export function localeAlternates(
+  path = "",
+  availableLocales: readonly Locale[] = locales,
+) {
+  const languages: Record<string, string> = Object.fromEntries(
+    availableLocales.map((locale) => [locale, localizedUrl(locale, path)]),
+  );
+  if (availableLocales.includes("en")) {
+    languages["x-default"] = localizedUrl("en", path);
+  }
+
   return {
-    languages: {
-      en: localizedUrl("en", path),
-      id: localizedUrl("id", path),
-      ja: localizedUrl("ja", path),
-      ko: localizedUrl("ko", path),
-      "x-default": localizedUrl("en", path),
-    },
+    languages,
   };
 }
 
@@ -49,4 +53,17 @@ export function descriptionFromRichText(value: unknown, fallback: string) {
 
   if (!text) return fallback;
   return text.length > 160 ? `${text.slice(0, 157).trimEnd()}...` : text;
+}
+
+export function titleForLocale(title: string, locale: Locale) {
+  switch (locale) {
+    case "en":
+      return `${title} - Setup and Usage Guide | CRMAI`;
+    case "id":
+      return `${title} - Cara Menggunakan dan Mengatur | CRMAI`;
+    case "ja":
+      return `${title}｜CRMAI公式ガイド`;
+    case "ko":
+      return `${title} | CRMAI 사용 가이드`;
+  }
 }

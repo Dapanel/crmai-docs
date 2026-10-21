@@ -7,27 +7,21 @@ import { ThemeScript } from "@/components/theme-script";
 import { siteName, siteUrl } from "@/seo";
 
 export const metadata: Metadata = {
-  title: {
-    default: "CRMAI Docs",
-    template: "%s | CRMAI Docs",
-  },
-  description: "Dokumentasi resmi CRMAI.",
+  title: "CRMAI Help Center",
+  description: "Setup and usage guides for CRMAI.",
   metadataBase: new URL(siteUrl),
   applicationName: "CRMAI Docs",
-  alternates: {
-    canonical: "/en",
-  },
   openGraph: {
     type: "website",
     siteName,
     title: siteName,
-    description: "Dokumentasi resmi CRMAI.",
+    description: "Setup and usage guides for CRMAI.",
     url: siteUrl,
   },
   twitter: {
     card: "summary",
     title: siteName,
-    description: "Dokumentasi resmi CRMAI.",
+    description: "Setup and usage guides for CRMAI.",
   },
   icons: {
     icon: "/logos.svg",

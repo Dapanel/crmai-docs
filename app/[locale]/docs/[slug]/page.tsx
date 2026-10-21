@@ -5,13 +5,17 @@ import { notFound } from "next/navigation";
 import { basehub } from "basehub";
 import { Pump } from "basehub/react-pump";
 import { parseToc } from "./parse-toc";
-import { locales, type Locale } from "@/app/[locale]/layout";
+import type { Locale } from "@/locales";
 import type { Metadata } from "next";
 import {
   descriptionFromRichText,
   localeAlternates,
   localizedUrl,
+  siteName,
+  titleForLocale,
 } from "@/seo";
+import { articleSeoCopy } from "@/seo-content";
+import { getLocalizedDocumentationPages } from "@/seo-routes";
 import { renderIcon } from "../render-icon";
 
 const parentIntro: Record<Locale, string> = {
@@ -100,6 +104,7 @@ export async function generateMetadata(props: {
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await props.params;
+  const curated = articleSeoCopy[slug]?.[locale as Locale];
   const { documentation } = await basehub().query({
     documentation: {
       pages: {
@@ -110,8 +115,11 @@ export async function generateMetadata(props: {
         } as never,
         items: {
           _title: true,
-          category: { _title: true },
-          richText: { json: { content: true } },
+          seoTitle: true,
+          seoDescription: { plainText: true },
+          ...(curated?.description
+            ? {}
+            : { richText: { json: { content: true } } }),
         },
       },
     },
@@ -120,42 +128,54 @@ export async function generateMetadata(props: {
   const page = documentation.pages.items.at(0);
   if (!page) notFound();
 
+  const title =
+    page.seoTitle?.trim() ||
+    curated?.title ||
+    titleForLocale(page._title, locale as Locale);
+  const richTextContent = curated?.description
+    ? undefined
+    : (
+        page as typeof page & {
+          richText?: { json?: { content?: unknown } } | null;
+        }
+      ).richText?.json?.content;
+  const description =
+    page.seoDescription?.plainText.trim() ||
+    curated?.description ||
+    descriptionFromRichText(
+      richTextContent,
+      locale === "id"
+        ? `Pelajari ${page._title} di CRMAI.`
+        : locale === "ja"
+          ? `CRMAIの${page._title}に関する設定と使い方を確認できます。`
+          : locale === "ko"
+            ? `CRMAI ${page._title} 기능의 설정과 사용 방법을 확인하세요.`
+            : `Learn how to use ${page._title} in CRMAI.`,
+    );
+
   return {
-    title: page._title,
-    description: descriptionFromRichText(
-      page.richText?.json.content,
-      page.category?._title
-        ? `${page._title} — ${page.category._title}`
-        : `Pelajari ${page._title} di CRMAI Docs.`,
-    ),
+    title,
+    description,
     alternates: {
       canonical: localizedUrl(locale as Locale, `/docs/${slug}`),
       ...localeAlternates(`/docs/${slug}`),
     },
     openGraph: {
       type: "article",
-      title: page._title,
-      description: descriptionFromRichText(
-        page.richText?.json.content,
-        `Pelajari ${page._title} di CRMAI Docs.`,
-      ),
+      siteName,
+      title,
+      description,
       url: localizedUrl(locale as Locale, `/docs/${slug}`),
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
     },
   };
 }
 
 export async function generateStaticParams() {
-  const { documentation } = await basehub().query({
-    documentation: {
-      pages: {
-        items: { _slug: true },
-      },
-    },
-  });
-
-  return locales.flatMap((locale) =>
-    documentation.pages.items
-      .filter((item) => item._slug !== "index")
-      .map((item) => ({ locale, slug: item._slug })),
-  );
+  const pages = await getLocalizedDocumentationPages();
+  return pages.map(({ locale, slug }) => ({ locale, slug }));
 }

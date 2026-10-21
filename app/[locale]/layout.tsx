@@ -3,9 +3,11 @@ import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import { Provider } from "@/app/provider";
 import { Toolbar } from "basehub/next-toolbar";
+import { locales, type Locale } from "@/locales";
 
-export const locales = ["en", "id", "ja", "ko"] as const;
-export type Locale = (typeof locales)[number];
+export { locales, type Locale };
+
+export const revalidate = 3600;
 
 export default async function LocaleLayout({
   children,

@@ -1,7 +1,8 @@
 import Link from "fumadocs-core/link";
 import type { Metadata } from "next";
 import { localeAlternates, localizedUrl, siteName } from "@/seo";
-import type { Locale } from "@/app/[locale]/layout";
+import { homeSeoCopy } from "@/seo-content";
+import type { Locale } from "@/locales";
 
 const homeCopy: Record<
   Locale,
@@ -53,13 +54,25 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const copy = homeCopy[locale as Locale];
+  const copy = homeSeoCopy[locale as Locale];
   return {
-    title: siteName,
+    title: copy.title,
     description: copy.description,
     alternates: {
       canonical: localizedUrl(locale as Locale),
       ...localeAlternates(),
+    },
+    openGraph: {
+      type: "website",
+      siteName,
+      title: copy.title,
+      description: copy.description,
+      url: localizedUrl(locale as Locale),
+    },
+    twitter: {
+      card: "summary",
+      title: copy.title,
+      description: copy.description,
     },
   };
 }
