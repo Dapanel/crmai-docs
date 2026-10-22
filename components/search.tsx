@@ -13,7 +13,7 @@ import {
   type SharedProps,
 } from "fumadocs-ui/components/dialog/search";
 import { useMemo } from "react";
-import type { Locale } from "@/app/[locale]/layout";
+import type { Locale } from "@/locales";
 
 export function Search({
   _searchKey,

@@ -4,7 +4,7 @@ import { getBaseOptions } from "@/app/layout.config";
 import { Pump } from "basehub/react-pump";
 import { renderIcon } from "./render-icon";
 import type * as PageTree from "fumadocs-core/page-tree";
-import type { Locale } from "@/app/[locale]/layout";
+import type { Locale } from "@/locales";
 
 export default async function Layout({
   children,

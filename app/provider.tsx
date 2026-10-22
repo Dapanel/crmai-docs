@@ -2,7 +2,7 @@
 import { Search } from "@/components/search";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import { ReactNode, useMemo } from "react";
-import type { Locale } from "@/app/[locale]/layout";
+import type { Locale } from "@/locales";
 
 export function Provider({
   children,
